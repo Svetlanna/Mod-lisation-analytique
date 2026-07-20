@@ -1,0 +1,9 @@
+CLIENT001;Dupont;2024-01;450.20;électricité
+CLIENT001;Dupont;2024-02;512.80;électricité
+CLIENT001;Dupont;2024-03;389.50;électricité
+CLIENT002;Martin;2024-01;1200.00;gaz
+CLIENT002;Martin;2024-02;980.50;gaz
+CLIENT002;Martin;2024-03;1150.75;gaz
+CLIENT003;Bernard;2024-01;320.40;électricité
+CLIENT003;Bernard;2024-02;295.80;électricité
+CLIENT003;Bernard;2024-03;410.20;électricité

@@ -1,0 +1,5 @@
+date|centrale|production
+2024-01-15|Barrage_Rhone|12500.0
+2024-01-15|Barrage_Loire|8200.5
+2024-01-16|Barrage_Rhone|11800.3
+2024-01-16|Barrage_Loire|9100.7
