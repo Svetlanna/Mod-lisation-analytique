@@ -42,16 +42,11 @@ doublons.
 Agrégations : Requêtes SQL optimisées avec SUM(), GROUP BY et ORDER BY ... DESC LIMIT 1.
 4. Algorithmes de Tri et Complexité
 Implémentation d'un tri à bulles (Bubble Sort) pour structurer les données de production :
-•
+   
 
-•
 
-•
 
-•
-•
 
-•
 
 Page 1
 
