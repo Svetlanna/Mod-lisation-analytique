@@ -1,74 +1,59 @@
-README Technique : Pipeline & Analyse Énergétique
+# Projet Énergie — Algorithmique, Fichiers & Mini Pipeline
 
+Ce projet regroupe trois exercices Python indépendants autour du traitement de données liées à la production d'énergie et à la facturation client.
 
-1. Architecture Globale et Gestion des Fichiers
+## 1. `algo.py` — Algorithmique sur une liste de centrales
 
-Sécurité & Robustesse OS : La bibliothèque standard os:
+Ce script travaille sur une liste de centrales (nom, type, production en GWh).
 
-os.makedirs(DATA_DIR, exist_ok=True) : Crée le dossier data/ de manière sécurisée sans
-erreur s'il existe déjà.
-os.path.join(...) : Assure la normalisation des chemins de fichiers pour éviter les problèmes de
-séparateurs (/ vs \\).
+- **Tri à bulles** : la fonction `tri_a_bulles` trie les centrales par production décroissante, sans utiliser `sorted()` ni `.sort()`.
+- **Recherche par type** : la fonction `recherche_par_type(liste, type_energie)` renvoie toutes les centrales correspondant à un type d'énergie donné (recherche insensible à la casse).
+- **Calculs manuels** : le total de production, la moyenne et la centrale la plus/moins productive sont calculés avec une boucle, sans utiliser `sum()`, `min()` ni `max()`.
 
-Blocs with open(...) as f: : Assurent la fermeture automatique des fichiers pour éviter les fuites de
-mémoire.
+Exécution :
+```bash
+python algo.py
+```
 
+## 2. `Manipulation.py` — Fichiers et dictionnaires
 
-2. Pipeline ETL et Normalisation Hétérogène
+Ce script lit le fichier `data/factures.txt` (format `client;nom;mois;montant;type_energie`) et construit un dictionnaire par client contenant :
+- son nom et son type d'énergie,
+- la liste de ses factures,
+- le total et la moyenne annuels.
 
-Le système consolide des formats d'entrée hétérogènes en un modèle de données unique :
+Il affiche ensuite, pour chaque client, son total annuel et sa facture la plus élevée, puis identifie le client le plus dépensier et le moins dépensier. Un fichier `data/synthese.txt` est généré avec une ligne de résumé par client. Le script calcule aussi le mois où la dépense globale (tous clients confondus) est la plus élevée.
 
-Source Format Séparateur / Structure Règle de Coût
-Solaire CSV Virgule (,) avec en-tête (prod / 1000) × 48.0 €
-Éolien JSON Tableau d'objets (dictionnaires) (prod / 1000) × 52.0 €
-Hydraulique TXT Barre verticale (|) (prod / 1000) × 38.0 €
+Exécution :
+```bash
+python Manipulation.py
+```
 
-Gestion des Erreurs & Logging : Chaque source est isolée dans un bloc try...except. Les anomalies
-(ex: production négative) sont journalisées avec horodatage :
-def log_erreur(message):
-erreurs.append(f"[{datetime.now()}] {message}\n")
-Les erreurs sont stockées dans pipeline_erreurs.log pour l'audit.
+## 3. `pipeline.py` — Consolidation multi-source vers SQLite
 
-3. Persistance Relationnelle avec SQLite
+Ce script simule la réception de relevés de production dans trois formats différents (CSV pour le solaire, JSON pour l'éolien, texte délimité par `|` pour l'hydraulique) et les consolide dans une base SQLite unique.
 
+Étapes du pipeline :
+1. **Extraction** de chaque fichier selon son format propre.
+2. **Transformation** : conversion des dates, vérification que la production est positive (les anomalies sont signalées sans bloquer le traitement), et calcul d'un coût estimé (48 €/MWh pour le solaire, 52 €/MWh pour l'éolien, 38 €/MWh pour l'hydraulique).
+3. **Chargement** dans la table `productions` de `data/energies.db`, sans doublons (contrainte unique sur `date` + `source`).
+4. **Rapport** affiché en console : production totale par type d'énergie, jour le plus productif toutes sources confondues, coût total estimé par type d'énergie.
 
-La base de données SQLite assure la persistance et la fiabilité :
-Schéma Déclaratif : Création rigoureuse de la table via CREATE TABLE IF NOT EXISTS.
-Dédoublonnage : Utilisation de UNIQUE(date, source) et INSERT OR IGNORE pour éviter les
-doublons.
-Agrégations : Requêtes SQL optimisées avec SUM(), GROUP BY et ORDER BY ... DESC LIMIT 1.
-4. Algorithmes de Tri et Complexité
-Implémentation d'un tri à bulles (Bubble Sort) pour structurer les données de production :
-   
+Si un fichier est absent ou contient des lignes mal formatées, le pipeline continue son exécution avec les autres fichiers et consigne l'erreur dans `data/pipeline_erreurs.log`.
 
+Exécution :
+```bash
+python pipeline.py
+```
 
+## Prérequis
 
+- Python 3 (aucune bibliothèque externe n'est nécessaire : `sqlite3`, `json`, `datetime` et `os` font partie de la bibliothèque standard).
 
+## Ordre d'exécution recommandé
 
-Page 1
-
-def tri_a_bulles(liste):
-n = len(liste)
-arr = list(liste)
-for i in range(n):
-for j in range(0, n - i - 1):
-if arr[j]["production"] < arr[j + 1]["production"]:
-arr[j], arr[j + 1] = arr[j + 1], arr[j]
-return arr
-Analyse : Complexité temporelle de O(n^2) et spatiale de O(n). Idéal pour de petits jeux de données (<50
-éléments) grâce à sa simplicité.
-
-
-5. Indicateurs Clés de Performance (KPIs)
-Facturation Client : Totaux annuels, moyennes, client le plus dépensier et mois de charge maximale.
-Énergies Renouvelables : Cumuls de production par filière et calcul dynamique des coûts.
-Statistiques Globales : Production totale, moyenne par infrastructure et centrale de tête.
-
-6. Recommandations pour le Déploiement
-
-
-Industrialisation : Remplacer le tri à bulles par Timsort (O(n \log n) via sorted()) si le volume dépasse
-10 000 enregistrements.
-Surveillance : Mettre en place un système d'alerte en cas de nouvelles erreurs dans
-pipeline_erreurs.log.
-Tests Unitaires : Utiliser pytest pour valider la non-régression du parsing et des règles SQL.
+`pipeline.py` importe `algo` et `Manipulation`, donc lancer simplement :
+```bash
+python pipeline.py
+```
+exécute les trois scripts à la suite.
