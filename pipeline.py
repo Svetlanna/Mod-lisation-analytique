@@ -44,7 +44,7 @@ erreurs = []
 def log_erreur(message):
     erreurs.append(f"[{datetime.now()}] {message}\n")
 
-# Traitement Solaire.csv
+#solaire.csv
 try:
     if not os.path.exists(os.path.join(DATA_DIR, "solaire.csv")):
         raise FileNotFoundError("solaire.csv absent")
@@ -85,7 +85,7 @@ try:
 except Exception as e:
     log_erreur(f"Erreur globale sur eolien.json : {e}")
 
-# Traitement Hydraulique.txt
+#traitement hydraulique.txt
 try:
     if not os.path.exists(os.path.join(DATA_DIR, "hydraulique.txt")):
         raise FileNotFoundError("hydraulique.txt absent")
@@ -112,7 +112,7 @@ if erreurs:
         f.writelines(erreurs)
 
 
-# utilisation de os.path.join pour SQLite
+#utilisation de os.path.join pour SQLite
 conn = sqlite3.connect(os.path.join(DATA_DIR, "energies.db"))
 cursor = conn.cursor()
 
@@ -136,7 +136,7 @@ for row in donnees_normalisees:
 
 conn.commit()
 
-print("\n--- RAPPORT PIPELINE ---")
+
 print("1. Production totale par type d'énergie :")
 cursor.execute("SELECT type_energie, SUM(production_kwh) FROM productions GROUP BY type_energie")
 for r in cursor.fetchall():

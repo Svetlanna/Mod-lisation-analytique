@@ -1,9 +1,6 @@
 README Technique : Pipeline & Analyse Énergétique
 
 
-Guide simple et structuré pour les chefs de projet technique
-
-
 1. Architecture Globale et Gestion des Fichiers
 
 Sécurité & Robustesse OS : La bibliothèque standard os:

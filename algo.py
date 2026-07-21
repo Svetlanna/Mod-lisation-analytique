@@ -32,7 +32,6 @@ def recherche_par_type(liste, type_energie):
             resultats.append(c)
     return resultats
 
-
 total_prod = 0
 centrale_max = centrales[0]
 centrale_min = centrales[0]
